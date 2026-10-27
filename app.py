@@ -69,9 +69,20 @@ def show_moves_for_pokemon(pokemon_name, data, moves):
 
     found_moves = False
     for move in moves:
-        move_type = move.get("type", "").lower()
+        move_type = str(move.get("type", "")).lower()
         if move_type in poke_types:
-            print(f"- {move.get('name')} ({move.get('type')})")
+            # 1. Look for common naming keys safely
+            move_name_data = move.get("name") or move.get("ename") or move.get("move")
+            
+            # 2. Check if the name data exists and is a dictionary
+            if isinstance(move_name_data, dict):
+                move_name = move_name_data.get(lang.lower(), move_name_data.get("english", "Unknown"))
+            elif move_name_data is not None:
+                move_name = move_name_data
+            else:
+                move_name = "Unknown Move Name" # Fallback if no keys matched
+                
+            print(f"- {move_name} ({move.get('type')})")
             found_moves = True
 
     if not found_moves:
