@@ -7,7 +7,8 @@ except FileNotFoundError:
     moves_data = []
     print("Warning: 'moves.json' not found. Move features will be limited.")
 ## create variable "data" that represents the enitre pokedex list
-data = json.load(pokedex)
+with open('pokedex.json', 'r', encoding='utf-8') as pokedex_file:
+    data = json.load(pokedex_file)
 print(data[0])
 
 # Create a function that will take the data from the JSON file and you will iterate through the list of pokemon and print each pokemons name.
@@ -76,6 +77,31 @@ def show_moves_for_pokemon(pokemon_name, data, moves):
     if not found_moves:
         print("No matching moves found in moves.json for these types.")
 
-print("welcome to pokedex! type 1 to print pokemon names.")
-if user_input==1:
-    print_pokemon_names
+print("welcome to pokedex! type 1 to print pokemon names,type 2 to print all pokemon a single type, type 3 to search by a fragment of a pokemons name, type 4 to show the moves a pokemon can leane based on it's name")
+lang = input("Enter language (english, japanese, chinese, french): ").strip()
+if not lang:
+    lang = "english"
+choice = int(input("Enter your choice: "))
+
+if choice == 1:
+    print_pokemon_names(data, lang)
+
+elif choice == 2:
+    search_type = input("Enter the Pokémon type (e.g., Fire, Water, Grass): ").strip()
+    results = get_pokemon_by_type(data, search_type)
+    for p in results:
+        name_info = p.get("name")
+        if isinstance(name_info, dict):
+            print(name_info.get(lang.lower(), name_info.get("english")))
+        else:
+            print(name_info)
+
+elif choice == 3:
+    query = input("Enter name fragment to search (e.g., Char): ").strip()
+    matches = search_pokemon_by_name(data, query)
+    for name in matches:
+        print(name)
+
+elif choice == 4:
+    poke_name = input("Enter the full English name of a Pokémon: ").strip()
+    show_moves_for_pokemon(poke_name, data, moves_data)
